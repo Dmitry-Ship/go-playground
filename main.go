@@ -1,5 +1,5 @@
 package main
 
 func main() {
-	testRobustWorkerPool()
+	testWorkerPool()
 }
