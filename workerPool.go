@@ -11,82 +11,89 @@ import (
 type Task struct {
 	Err         error
 	Id          int
-	executeTask func() error
+	executeTask func() (error, string)
 }
 
-func (t *Task) Run(wg *sync.WaitGroup) {
-	t.Err = t.executeTask()
-	wg.Done()
+func (t *Task) Run(wg *sync.WaitGroup) string {
+	err, result := t.executeTask()
+	t.Err = err
+	// wg.Done()
+
+	return result
 }
 
 type Result struct {
-	Value string
+	Value  string
+	TaskId int
 }
 
 type WorkerPool struct {
-	numberOfWorkers int
-	tasks           []*Task
-	tasksChan       chan *Task
-	resultsChan     chan *Result
-	wg              sync.WaitGroup
+	limit       int
+	taskQueue   []*Task
+	tasksChan   chan *Task
+	resultsChan chan *Result
+	wg          sync.WaitGroup
 }
 
-func NewWorkerPool(numberOfWorkers int) *WorkerPool {
+func NewWorkerPool(numberOfWorkers int, capacity int) *WorkerPool {
 	return &WorkerPool{
-		numberOfWorkers: numberOfWorkers,
-		tasksChan:       make(chan *Task),
-		resultsChan:     make(chan *Result),
+		limit:       numberOfWorkers,
+		tasksChan:   make(chan *Task, capacity),
+		resultsChan: make(chan *Result, capacity),
 	}
 }
 
 func (p *WorkerPool) addTask(task *Task) {
-	p.tasks = append(p.tasks, task)
+	p.taskQueue = append(p.taskQueue, task)
 }
 
 func (p *WorkerPool) runWorker() {
+	p.wg.Add(1)
+
 	for task := range p.tasksChan {
-		task.Run(&p.wg)
-		result := Result{Value: "task id " + strconv.Itoa(task.Id)}
+
+		result := Result{
+			Value:  task.Run(&p.wg),
+			TaskId: task.Id,
+		}
 
 		p.resultsChan <- &result
 	}
+
+	p.wg.Done()
 }
 
 func (p *WorkerPool) run() {
-	p.wg.Add(len(p.tasks))
-
-	for i := 0; i < p.numberOfWorkers; i++ {
+	for i := 0; i < p.limit; i++ {
 		go p.runWorker()
 	}
 
 	go func() {
-		for _, task := range p.tasks {
-			p.tasksChan <- task
-		}
-	}()
-
-	go func() {
 		for result := range p.resultsChan {
-			fmt.Println("result: " + result.Value)
+			fmt.Println(fmt.Sprintf("task id: %d, value: %s", result.TaskId, result.Value))
 		}
 	}()
 
-	p.wg.Wait()
+	for _, task := range p.taskQueue {
+		p.tasksChan <- task
+	}
+
 	close(p.tasksChan)
+	p.wg.Wait()
 	close(p.resultsChan)
 }
 
-func performLongWork() error {
-	randomNumber := rand.Intn(20)
+func performLongWork() (error, string) {
+	randomNumber := rand.Intn(10)
 
 	time.Sleep(time.Duration(randomNumber) * time.Second)
-	return nil
+	return nil, strconv.Itoa(randomNumber)
 }
 
 func testWorkerPool() {
-	workerPool := NewWorkerPool(20)
+	workerPool := NewWorkerPool(10, 10)
 
-	for i := 0; i < 100; i++ {
+	for i := 0; i < 20; i++ {
 		task := &Task{executeTask: performLongWork, Id: i}
 		workerPool.addTask(task)
 	}
