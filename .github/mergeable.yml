@@ -6,3 +6,16 @@ mergeable:
         no_empty:
           enabled: true
           message: Description matter and should not be empty. Provide detail with **what** was changed, **why** it was changed, and **how** it was changed.
+      - do: approvals
+        min:
+          count: 1
+          message: "You need at least one approval"
+        required:
+          reviewers: []
+          owners: true
+          assignees: true
+          requested_reviewers: true
+          message: "Waiting for approval from assignees, requested reviewers or owners"
+        block:
+          changes_requested: true
+          message: "Changes requested"
