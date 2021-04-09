@@ -16,11 +16,9 @@ func readResults(results chan *Result) {
 func mockWork(workerPool *WorkerPool, results chan *Result) {
 	for {
 		taskID := rand.Intn(100)
-
 		if taskID == 0 {
 			workerPool.Stop()
 		}
-
 		time.Sleep(time.Duration(rand.Intn(5)) * time.Millisecond)
 		task := NewTask(taskID, results)
 		workerPool.Enqueue(task)
