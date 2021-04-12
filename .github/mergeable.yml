@@ -5,7 +5,7 @@ mergeable:
       - do: or
         validate:
           - do: headRef
-            must_exclude:
+            must_include:
               regex: "hotfix"
           - do: description
             no_empty:
@@ -14,7 +14,7 @@ mergeable:
       - do: or
         validate:
           - do: headRef
-            must_exclude:
+            must_include:
               regex: "hotfix"
           - do: approvals
             min:
