@@ -2,43 +2,37 @@ package workerpool
 
 import (
 	"fmt"
-	"math/rand"
-	"time"
+	"sync"
 
 	"github.com/Dmitry-Ship/playground/common"
 )
 
-func readResults(results chan *Result) {
-	for result := range results {
-		fmt.Printf("✅ finished %d\n", result.TaskId)
+func mockWork(dispatcher *Dispatcher) {
+	c := make(chan Result)
+	var wg sync.WaitGroup
+	for i := 0; i < 40; i++ {
+		job := NewJob(i, c)
+		wg.Add(1)
+
+		go dispatcher.Enqueue(job)
 
 	}
-}
 
-func mockWork(workerPool *WorkerPool, results chan *Result) {
-	for {
-		taskID := rand.Intn(100)
-
-		if taskID == 0 {
-			workerPool.Stop()
+	go func() {
+		for r := range c {
+			fmt.Printf("✅ result: %d \n", r.JobId)
+			wg.Done()
 		}
+	}()
 
-		time.Sleep(time.Duration(rand.Intn(5)) * time.Millisecond)
-		task := NewTask(taskID, results)
-		workerPool.Enqueue(task)
-	}
-
+	wg.Wait()
 }
 
 func program() {
 	const concurrency = 10
-	results := make(chan *Result, concurrency)
-	workerPool := NewWorkerPool(concurrency)
-
-	go mockWork(workerPool, results)
-	go readResults(results)
-
-	workerPool.runWorkerPool()
+	dispatcher := NewDispatcher(concurrency)
+	go dispatcher.Run()
+	mockWork(dispatcher)
 }
 
 func TestWorkerPool() {

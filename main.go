@@ -41,29 +41,27 @@ func fanIn(input1, input2 <-chan string) <-chan string {
 }
 
 func main() {
-	// c := fanIn(boring("Joe"), boring("Ann"))
-
-	// timeout := time.After(5 * time.Second)
-	// for {
-	// 	select {
-	// 	case s := <-c:
-	// 		fmt.Println(s)
-	// 	case <-timeout:
-	// 		fmt.Println("You talk too much.")
-	// 		return
-	// 	}
-	// }
-
-	workerpool.TestWorkerPool()
-
 	if err := godotenv.Load(); err != nil {
 		log.Fatal("Error loading .env file")
 	}
+
+	workerpool.TestWorkerPool()
+
+	// maxWorkers, err := strconv.Atoi(os.Getenv("MAX_WORKERS"))
+
+	// if err == nil {
+	// 	workerpool.TestWorkerPool()
+
+	// 	const concurrency = 5
+	// 	dispatcher := workerpool.NewDispatcher(maxWorkers)
+	// 	go dispatcher.Run()
+	// }
 
 	http.HandleFunc("/", chat.RootHandler)
 	http.Handle("/socket", websocket.Handler(chat.SocketHandler))
 	http.HandleFunc("/api", IndexHandler)
 	http.HandleFunc("/api/message", GetMessageHandler)
+
 	port := os.Getenv("PORT")
 	host := os.Getenv("HOST")
 	fmt.Println("Listening to: http://" + host + ":" + port)

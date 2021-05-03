@@ -12,5 +12,5 @@ func MeasureTime(f func()) {
 
 	endTime := time.Now()
 	diff := endTime.Sub(startTime)
-	fmt.Println("total time taken ", diff.Seconds(), "seconds")
+	fmt.Println("🏁 Took ===============> ", diff.Seconds(), "seconds")
 }
