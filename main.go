@@ -29,6 +29,9 @@ func main() {
 	http.HandleFunc("/", chat.RootHandler)
 	http.Handle("/socket", websocket.Handler(chat.SocketHandler))
 
+	http.HandleFunc("/api", IndexHandler)
+	http.HandleFunc("/api/message", GetMessageHandler)
+
 	port := os.Getenv("PORT")
 	host := os.Getenv("HOST")
 	fmt.Println("Listening to: http://" + host + ":" + port)
