@@ -17,7 +17,6 @@ func main() {
 	if err := godotenv.Load(); err != nil {
 		log.Fatal("Error loading .env file")
 	}
-
 	maxWorkers, err := strconv.Atoi(os.Getenv("MAX_WORKERS"))
 
 	if err != nil {
