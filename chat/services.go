@@ -16,10 +16,14 @@ var partner = make(chan io.ReadWriteCloser)
 
 func Match(c io.ReadWriteCloser) {
 	fmt.Fprint(c, "Waiting for a partner...")
+
 	select {
 	case partner <- c:
+		fmt.Fprint(c, "second partner")
 		// now handled by the other goroutine
 	case p := <-partner:
+		fmt.Fprint(c, "first partner")
 		сhat(p, c)
 	}
+
 }

@@ -38,7 +38,7 @@ var rootTemplate = template.Must(template.New("root").Parse(`
 <meta charset="utf-8" />
 <script>
 	const onMessage = (m) => console.log("Received:", m.data)
-	const onClose = () => console.log("tying to close")
+	const onClose = () => console.log("trying to close")
     websocket = new WebSocket("ws://{{.}}/socket");
     websocket.onmessage = onMessage;
     websocket.onclose = onClose;

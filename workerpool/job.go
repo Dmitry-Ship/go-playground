@@ -1,11 +1,5 @@
 package workerpool
 
-import (
-	"math/rand"
-	"strconv"
-	"time"
-)
-
 type Result struct {
 	Value string
 	JobId int
@@ -18,13 +12,6 @@ type Job struct {
 	resultChan  chan Result
 }
 
-func performLongWork() (error, string) {
-	randomNumber := rand.Intn(1000)
-
-	time.Sleep(time.Duration(randomNumber) * time.Millisecond)
-	return nil, strconv.Itoa(randomNumber)
-}
-
 func (j *Job) Run() {
 	err, result := j.executeTask()
 
@@ -35,9 +22,9 @@ func (j *Job) Run() {
 	}
 }
 
-func NewJob(id int, resultChan chan Result) *Job {
-	return &Job{
-		executeTask: performLongWork,
+func NewJob(id int, resultChan chan Result, fn func() (error, string)) Job {
+	return Job{
+		executeTask: fn,
 		Id:          id,
 		resultChan:  resultChan,
 	}
