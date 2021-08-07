@@ -21,7 +21,7 @@ func (d *Dispatcher) Run() {
 	for i := 0; i < d.concurrency; i++ {
 		worker := NewWorker(i, d.pool)
 		d.workers = append(d.workers, worker)
-		worker.Run()
+		go worker.Run()
 	}
 
 	go d.dispatch()
@@ -30,12 +30,9 @@ func (d *Dispatcher) Run() {
 }
 
 func (d *Dispatcher) dispatch() {
-	for {
-		select {
-		case job := <-d.jobQuequeChan:
-			workerChan := <-d.pool // wait for available channel
-			workerChan <- job      // dispatch work to worker
-		}
+	for job := range d.jobQuequeChan {
+		workerChan := <-d.pool // wait for available channel
+		workerChan <- job      // dispatch work to worker
 	}
 }
 
@@ -45,7 +42,7 @@ func (d *Dispatcher) Enqueue(job Job) {
 
 func (d *Dispatcher) Stop() {
 	for _, w := range d.workers {
-		w.Stop()
+		go w.Stop()
 	}
 
 	d.runBackground <- true

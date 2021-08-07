@@ -1,6 +1,7 @@
 package common
 
 import (
+	"fmt"
 	"net/http"
 	"os"
 	"sync"
@@ -17,28 +18,24 @@ func ErrorHandler(fn http.HandlerFunc) http.HandlerFunc {
 	}
 }
 
-func FanIn(cs ...<-chan string) <-chan string {
+func FanIn(inputChannels ...<-chan string) <-chan string {
 	var wg sync.WaitGroup
-	out := make(chan string)
+	outputChannel := make(chan string)
 
-	// Start an output goroutine for each input channel in cs.  output
-	// copies values from c to out until c is closed, then calls wg.Done.
-	output := func(c <-chan string) {
-		for n := range c {
-			out <- n
-		}
-		wg.Done()
-	}
-	wg.Add(len(cs))
-	for _, c := range cs {
-		go output(c)
+	wg.Add(len(inputChannels))
+	for _, inputChannel := range inputChannels {
+		go func(ic <-chan string) {
+			for message := range ic {
+				outputChannel <- message
+			}
+			wg.Done()
+		}(inputChannel)
 	}
 
-	// Start a goroutine to close out once all the output goroutines are
-	// done.  This must start after the wg.Add call.
 	go func() {
 		wg.Wait()
-		close(out)
+		close(outputChannel)
+		fmt.Println("done: ")
 	}()
-	return out
+	return outputChannel
 }

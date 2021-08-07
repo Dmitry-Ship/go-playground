@@ -8,12 +8,12 @@ type Result struct {
 type Job struct {
 	Err         error
 	Id          int
-	executeTask func() (error, string)
+	executeTask func() (string, error)
 	resultChan  chan Result
 }
 
 func (j *Job) Run() {
-	err, result := j.executeTask()
+	result, err := j.executeTask()
 
 	j.Err = err
 	j.resultChan <- Result{
@@ -22,7 +22,7 @@ func (j *Job) Run() {
 	}
 }
 
-func NewJob(id int, resultChan chan Result, fn func() (error, string)) Job {
+func NewJob(id int, resultChan chan Result, fn func() (string, error)) Job {
 	return Job{
 		executeTask: fn,
 		Id:          id,

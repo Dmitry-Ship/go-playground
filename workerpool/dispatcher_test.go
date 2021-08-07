@@ -7,9 +7,9 @@ import (
 	"testing"
 )
 
-func performLongWork() (error, string) {
+func performLongWork() (string, error) {
 	randomNumber := rand.Intn(100)
-	return nil, strconv.Itoa(randomNumber)
+	return strconv.Itoa(randomNumber), nil
 }
 
 func createJobs(number int) []Job {

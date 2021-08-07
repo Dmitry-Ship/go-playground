@@ -18,24 +18,20 @@ func NewWorker(ID int, pool chan chan Job) *Worker {
 }
 
 func (wr *Worker) Run() {
-	go func() {
-		for {
-			wr.pool <- wr.jobChan
-			select {
-			case job := <-wr.jobChan:
-				// fmt.Printf("🎬 worker received job%d \n", job.Id)
-				job.Run()
-			case <-wr.quit:
-				return
+	for {
+		wr.pool <- wr.jobChan
+		select {
+		case job := <-wr.jobChan:
+			// fmt.Printf("🎬 worker received job%d \n", job.Id)
+			job.Run()
+		case <-wr.quit:
+			return
 
-			}
 		}
-	}()
+	}
 
 }
 
 func (wr *Worker) Stop() {
-	go func() {
-		wr.quit <- true
-	}()
+	wr.quit <- true
 }
