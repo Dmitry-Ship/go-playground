@@ -1,15 +1,15 @@
 package workerpool
 
 type Worker struct {
-	ID      int
+	Id      int
 	jobChan chan Job
 	pool    chan chan Job
 	quit    chan bool
 }
 
-func NewWorker(ID int, pool chan chan Job) *Worker {
+func NewWorker(Id int, pool chan chan Job) *Worker {
 	return &Worker{
-		ID:      ID,
+		Id:      Id,
 		jobChan: make(chan Job),
 		pool:    pool,
 

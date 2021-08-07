@@ -12,6 +12,14 @@ type Job struct {
 	resultChan  chan Result
 }
 
+func NewJob(id int, resultChan chan Result, fn func() (string, error)) Job {
+	return Job{
+		executeTask: fn,
+		Id:          id,
+		resultChan:  resultChan,
+	}
+}
+
 func (j *Job) Run() {
 	result, err := j.executeTask()
 
@@ -19,13 +27,5 @@ func (j *Job) Run() {
 	j.resultChan <- Result{
 		Value: result,
 		JobId: j.Id,
-	}
-}
-
-func NewJob(id int, resultChan chan Result, fn func() (string, error)) Job {
-	return Job{
-		executeTask: fn,
-		Id:          id,
-		resultChan:  resultChan,
 	}
 }

@@ -5,10 +5,12 @@ import (
 	"strconv"
 	"sync"
 	"testing"
+	"time"
 )
 
 func performLongWork() (string, error) {
 	randomNumber := rand.Intn(100)
+	time.Sleep(time.Duration(randomNumber) * time.Millisecond)
 	return strconv.Itoa(randomNumber), nil
 }
 
