@@ -1,5 +1,7 @@
 package workerpool
 
+import "fmt"
+
 type Dispatcher struct {
 	concurrency   int
 	pool          chan chan Job
@@ -37,6 +39,7 @@ func (d *Dispatcher) dispatch() {
 }
 
 func (d *Dispatcher) Enqueue(job Job) {
+	fmt.Println("🎬Enqueued job", job.Id)
 	d.jobQuequeChan <- job
 }
 

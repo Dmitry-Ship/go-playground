@@ -2,21 +2,8 @@ package common
 
 import (
 	"fmt"
-	"net/http"
-	"os"
 	"sync"
 )
-
-func ErrorHandler(fn http.HandlerFunc) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		defer func() {
-			if _, ok := recover().(os.LinkError); ok {
-				w.WriteHeader(500)
-			}
-		}()
-		fn(w, r)
-	}
-}
 
 func FanIn(inputChannels ...<-chan string) <-chan string {
 	var wg sync.WaitGroup
