@@ -43,13 +43,10 @@ func main() {
 			case <-done:
 				return
 			case <-ticker.C:
-
-				for i := 0; i < rand.Intn(50); i++ {
+				for i := 0; i < rand.Intn(10); i++ {
 					id++
 					job := workerpool.NewJob(id, resultChan, performLongWork)
-					time.Sleep(time.Duration(100) * time.Millisecond)
 					go dispatcher.Enqueue(job)
-
 				}
 			}
 		}

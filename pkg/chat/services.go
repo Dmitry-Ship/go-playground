@@ -5,7 +5,7 @@ import (
 	"io"
 )
 
-func сhat(a, b io.ReadWriteCloser) {
+func chat(a, b io.ReadWriteCloser) {
 	fmt.Fprintln(a, "Found one! Say hi.")
 	fmt.Fprintln(b, "Found one! Say hi.")
 	go io.Copy(a, b)
@@ -23,7 +23,7 @@ func Match(c io.ReadWriteCloser) {
 		// now handled by the other goroutine
 	case p := <-partner:
 		fmt.Fprint(c, "first partner")
-		сhat(p, c)
+		chat(p, c)
 	}
 
 }
